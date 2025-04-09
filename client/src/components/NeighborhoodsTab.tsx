@@ -87,7 +87,7 @@ const NeighborhoodsTab: React.FC = () => {
       (riskLevel === 'low' && filters.showLow)
     );
   })
-  // Sort by risk level (high to low)
+  // First sort by risk level (high to low), then by population count (high to low)
   .sort((a: LandslideRiskArea, b: LandslideRiskArea) => {
     // Risk priority: "Muito alto" > "Alto" > "Médio" > "Baixo"
     const scoreOrder: Record<string, number> = {
@@ -100,7 +100,16 @@ const NeighborhoodsTab: React.FC = () => {
     const aScore = scoreOrder[a.properties.risk_score as keyof typeof scoreOrder] || 0;
     const bScore = scoreOrder[b.properties.risk_score as keyof typeof scoreOrder] || 0;
     
-    return bScore - aScore; // Sort high to low
+    // First, compare risk scores
+    if (aScore !== bScore) {
+      return bScore - aScore; // Sort high to low by risk
+    }
+    
+    // If risk scores are equal, sort by population (number_of_people)
+    const aPopulation = a.properties.number_of_people || 0;
+    const bPopulation = b.properties.number_of_people || 0;
+    
+    return bPopulation - aPopulation; // Sort high to low by population
   }) : [];
   
   const handleNeighborhoodClick = (neighborhood: LandslideRiskArea) => {
