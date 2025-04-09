@@ -11,9 +11,10 @@ import {
 const initialState: AppContextState = {
   activeTab: "assets",
   filters: {
+    // Always assume high and medium risks are shown since we removed the UI controls
     showHigh: true,
     showMedium: true,
-    showLow: true,
+    showLow: false, // We're not showing low risk assets anymore
     showFloodRisk: true,
     showLandslideRisk: true
   },
