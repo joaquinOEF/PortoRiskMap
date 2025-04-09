@@ -23,13 +23,13 @@ const SidePanel: React.FC = () => {
       <div className="flex flex-wrap border-b border-neutral-200">
         <button 
           onClick={() => handleTabChange("neighborhoods")}
-          className={`flex-1 py-2 px-1 text-center text-sm ${state.activeTab === "neighborhoods" ? "tab-active font-semibold text-secondary border-b-2 border-secondary" : ""}`}
+          className={`flex-1 py-2 px-1 text-center text-sm ${state.activeTab === "neighborhoods" ? "tab-active font-semibold text-black border-b-2 border-secondary" : ""}`}
         >
           Neighborhoods
         </button>
         <button 
           onClick={() => handleTabChange("assets")}
-          className={`flex-1 py-2 px-1 text-center text-sm ${state.activeTab === "assets" ? "tab-active font-semibold text-secondary border-b-2 border-secondary" : ""}`}
+          className={`flex-1 py-2 px-1 text-center text-sm ${state.activeTab === "assets" ? "tab-active font-semibold text-black border-b-2 border-secondary" : ""}`}
         >
           Critical Assets
         </button>
