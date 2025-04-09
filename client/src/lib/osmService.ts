@@ -73,77 +73,62 @@ function getOsmName(tags: {[key: string]: string}): string {
   return tags.name || tags['name:en'] || tags['name:pt'] || 'Unnamed Asset';
 }
 
-// Helper function to check if a point is inside any polygon in a GeoJSON collection
-function isPointInAnyFeature(point: turf.Feature<turf.Point>, features: any[]): boolean {
-  // Make sure we have valid features
-  if (!features || !Array.isArray(features) || features.length === 0) {
-    return false;
-  }
-  
-  // Check each feature
-  for (const feature of features) {
-    try {
-      // Skip features without geometry
-      if (!feature.geometry) continue;
-      
-      // Create a polygon from the feature
-      let polygon;
+// Function to determine the risk level based on a point and polygons
+function isPointInPolygons(pointCoords: [number, number], features: any[]): boolean {
+  try {
+    if (!features || !Array.isArray(features) || features.length === 0) {
+      return false;
+    }
+    
+    const point = turf.point(pointCoords);
+    
+    for (const feature of features) {
+      if (!feature || !feature.geometry) continue;
       
       if (feature.geometry.type === 'Polygon') {
-        polygon = turf.polygon(feature.geometry.coordinates);
-      } else if (feature.geometry.type === 'MultiPolygon') {
-        // For MultiPolygon, check each polygon
+        const poly = turf.polygon(feature.geometry.coordinates);
+        if (turf.booleanPointInPolygon(point, poly)) {
+          return true;
+        }
+      } 
+      else if (feature.geometry.type === 'MultiPolygon') {
         for (const coords of feature.geometry.coordinates) {
-          polygon = turf.polygon(coords);
-          if (turf.booleanPointInPolygon(point, polygon)) {
+          const poly = turf.polygon(coords);
+          if (turf.booleanPointInPolygon(point, poly)) {
             return true;
           }
         }
-        continue; // Skip to next feature if none of the polygons contain the point
-      } else {
-        // Skip non-polygon features
-        continue;
       }
-      
-      // Check if point is inside the polygon
-      if (turf.booleanPointInPolygon(point, polygon)) {
-        return true;
-      }
-    } catch (error) {
-      console.warn('Error checking if point is in feature:', error);
-      continue;
     }
+    
+    return false;
+  } catch (err) {
+    console.warn('Error in point-in-polygon check:', err);
+    return false;
   }
-  
-  return false;
 }
 
-// Function to determine the risk level based on location in risk zones
+// Determine risk level based on point in various risk zones
 function determineRiskLevel(
   location: LatLng,
   highRiskFeatures: any[],
   mediumRiskFeatures: any[],
   lowRiskFeatures: any[]
 ): RiskLevel {
-  // Create a turf point from the location
-  const point = turf.point([location.lng, location.lat]);
+  const coords: [number, number] = [location.lng, location.lat];
   
-  // Check if point is in high risk zone
-  if (isPointInAnyFeature(point, highRiskFeatures)) {
+  if (isPointInPolygons(coords, highRiskFeatures)) {
     return 'high';
   }
   
-  // Check if point is in medium risk zone
-  if (isPointInAnyFeature(point, mediumRiskFeatures)) {
+  if (isPointInPolygons(coords, mediumRiskFeatures)) {
     return 'medium';
   }
   
-  // Check if point is in low risk zone
-  if (isPointInAnyFeature(point, lowRiskFeatures)) {
+  if (isPointInPolygons(coords, lowRiskFeatures)) {
     return 'low';
   }
   
-  // If not in any zone, return low risk
   return 'low';
 }
 

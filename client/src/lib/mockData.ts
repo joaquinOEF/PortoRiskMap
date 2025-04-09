@@ -224,19 +224,26 @@ export const getAssetTypeLabel = (type: AssetType): string => {
 export const getAssetIconSVG = (type: AssetType): string => {
   switch (type) {
     case "healthcare":
-      return '<path d="M4.8 2.3A.3.3 0 0 0 4.5 2H2.5a.5.5 0 0 0-.5.5v1c0 .28.22.5.5.5h2a.3.3 0 0 0 .3-.3V2.3z"/><path d="M8.5 2h-2a.3.3 0 0 0-.3.3v1.4a.3.3 0 0 0 .3.3h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/><path d="M9.5 4H2a1 1 0 0 0 0 2h.5a.5.5 0 0 1 .5.5.5.5 0 0 1-.5.5H2a1 1 0 0 0-1 1v3a3 3 0 0 0 3 3h3a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1h-.5a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5h.5a1 1 0 1 0 0-2zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm1.5 4.5a1.5 1.5 0 1 1-3 0V11h3v1.5z"/>';
+      // HeartPulse icon
+      return '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M3.22 12H9.5l.5-1 2 4 .5-2h6.1"></path>';
     case "financial":
-      return '<path d="M1 3a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V3Z"/><path d="M2 7a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1H2Z"/><path d="M6 11h2v5H6v-5Z"/><path d="M10 11h2v5h-2v-5Z"/><path d="M4 11h2v2H4v-2Z"/><path d="M12 11h2v2h-2v-2Z"/>';
+      // Building icon
+      return '<path d="M6 22V2l12 4v16"></path><path d="M6 12h12"></path><path d="M6 7h12"></path><path d="M6 17h12"></path>';
     case "transportation":
-      return '<path d="M19 17h2v2h-2v-2z"/><path d="M1 6a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v11a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H4v1a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6z"/><path d="M4 10a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H4z"/><path d="M5 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/><path d="M17 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>';
+      // Car icon
+      return '<path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"></path><circle cx="6.5" cy="16.5" r="2.5"></circle><circle cx="16.5" cy="16.5" r="2.5"></circle>';
     case "cultural":
-      return '<path d="M1 22h22"/><path d="M19 22V6a3 3 0 0 0-3-3H8a3 3 0 0 0-3 3v16"/><path d="M5 3v0"/><path d="M19 3v0"/><path d="M12 3v8"/><path d="M5 13v2"/><path d="M19 13v2"/><path d="M5 19v2"/><path d="M19 19v2"/>';
+      // Landmark icon
+      return '<path d="M3 22h18"></path><path d="M6 18v-5"></path><path d="M10 18v-5"></path><path d="M14 18v-5"></path><path d="M18 18v-5"></path><path d="m4 10 8-7 8 7"></path><path d="M6 2h12"></path>';
     case "utility":
-      return '<path d="M8 2v2"/><path d="M16 2v2"/><path d="M3 6h18"/><path d="M10 10 9 9l-2 2"/><path d="m15 10 1-1 2 2"/><path d="m10 14-1-1-2 2"/><path d="m15 14 1-1 2 2"/><path d="M7 18h10"/><path d="M8 22v-4"/><path d="M16 22v-4"/>';
+      // Zap icon
+      return '<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"></path>';
     case "education":
-      return '<path d="M2 10a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10Z"/><path d="M2 8v6"/><path d="M22 8v6"/><path d="m7 15 5-6 5 6"/><path d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2"/><path d="M12 12v6"/>';
+      // School icon
+      return '<path d="m4 6 8-4 8 4"></path><path d="m18 10-8-4-8 4"></path><path d="M4 10v7c0 2 1.5 3 3 3l5-3"></path><path d="M20 10v7c0 2-1.5 3-3 3l-5-3"></path><path d="m4 10 8 4 8-4"></path>';
     default:
-      return '<path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1v1H9z"/><path d="M14 9h1v1h-1z"/><path d="M9 14h1v1H9z"/><path d="M14 14h1v1h-1z"/>';
+      // Building icon
+      return '<path d="M6 22V2l12 4v16"></path><path d="M6 12h12"></path><path d="M6 7h12"></path><path d="M6 17h12"></path>';
   }
 };
 
