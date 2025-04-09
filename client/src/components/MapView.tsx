@@ -143,6 +143,24 @@ const MapView: React.FC = () => {
             fillOpacity: 0.8
           }).addTo(markersLayer!);
           
+          // Create tooltip content
+          const tooltipContent = `
+            <div class="marker-tooltip">
+              <strong>${n.name}</strong>
+              <div>Population at risk: ${n.populationAtRisk.toLocaleString()}</div>
+              <div class="tooltip-risks">
+                <span>Flood: <span class="capitalize" style="color: ${getRiskColor(n.floodRisk)}">${n.floodRisk}</span></span>
+                <span>Landslide: <span class="capitalize" style="color: ${getRiskColor(n.landslideRisk)}">${n.landslideRisk}</span></span>
+              </div>
+            </div>
+          `;
+          
+          // Add tooltip to marker
+          marker.bindTooltip(tooltipContent, { 
+            direction: 'top',
+            offset: L.point(0, -5)
+          });
+          
           marker.on('click', () => {
             dispatch({
               type: 'SELECT_ITEM',
@@ -192,6 +210,24 @@ const MapView: React.FC = () => {
           // Create marker
           const marker = L.marker([a.location.lat, a.location.lng], { icon }).addTo(markersLayer!);
           
+          // Create tooltip content for assets
+          const tooltipContent = `
+            <div class="marker-tooltip">
+              <strong>${a.name}</strong>
+              <div>Type: <span class="capitalize">${a.type}</span></div>
+              <div class="tooltip-risks">
+                <span>Flood: <span class="capitalize" style="color: ${getRiskColor(a.floodRisk)}">${a.floodRisk}</span></span>
+                <span>Landslide: <span class="capitalize" style="color: ${getRiskColor(a.landslideRisk)}">${a.landslideRisk}</span></span>
+              </div>
+            </div>
+          `;
+          
+          // Add tooltip to marker
+          marker.bindTooltip(tooltipContent, { 
+            direction: 'top',
+            offset: L.point(0, -8)
+          });
+          
           marker.on('click', () => {
             dispatch({
               type: 'SELECT_ITEM',
@@ -210,6 +246,28 @@ const MapView: React.FC = () => {
           opacity: 1,
           fillOpacity: 0.8
         }).addTo(markersLayer!);
+        
+        // Format date for tooltip
+        const formatDate = (dateString: string) => {
+          const date = new Date(dateString);
+          return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        };
+        
+        // Create tooltip content for events
+        const tooltipContent = `
+          <div class="marker-tooltip">
+            <strong>${e.title}</strong>
+            <div>${formatDate(e.date)}</div>
+            <div>Type: <span class="capitalize">${e.type}</span></div>
+            <div class="text-xs">Click for details</div>
+          </div>
+        `;
+        
+        // Add tooltip to marker
+        marker.bindTooltip(tooltipContent, { 
+          direction: 'top',
+          offset: L.point(0, -5)
+        });
         
         marker.on('click', () => {
           dispatch({
