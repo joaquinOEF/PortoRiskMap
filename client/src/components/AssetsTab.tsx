@@ -197,7 +197,7 @@ const AssetsTab: React.FC = () => {
             key={asset.id}
             className={`rounded shadow-sm p-3 mb-3 border-l-4 hover:shadow-md transition duration-200 cursor-pointer ${bgColor}`}
             onClick={() => handleAssetClick(asset.id)}
-            style={{ borderLeftColor }}
+            style={{ borderLeftColor: borderColor }}
           >
             <div className="flex justify-between items-start">
               <div>
