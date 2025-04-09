@@ -9,11 +9,13 @@ import {
 
 // Define the initial state
 const initialState: AppContextState = {
-  activeTab: "neighborhoods",
+  activeTab: "assets",
   filters: {
     showHigh: true,
     showMedium: true,
-    showLow: true
+    showLow: true,
+    showFloodRisk: true,
+    showLandslideRisk: true
   },
   selectedItem: {
     type: null,

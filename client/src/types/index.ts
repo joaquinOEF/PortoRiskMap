@@ -39,6 +39,8 @@ export interface FilterState {
   showHigh: boolean;
   showMedium: boolean;
   showLow: boolean;
+  showFloodRisk: boolean;
+  showLandslideRisk: boolean;
 }
 
 // Selected item state

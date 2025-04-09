@@ -19,17 +19,37 @@ const MapLegend: React.FC = () => {
       {expanded ? (
         <>
           <div className="mb-2">
-            <h5 className="text-xs font-medium mb-1">Map Elements</h5>
+            <h5 className="text-xs font-medium mb-1">Critical Assets</h5>
             <div className="grid grid-cols-1 gap-y-1">
               <div className="flex items-center">
-                <span className="w-3 h-3 border-2 border-white bg-gray-800 transform rotate-45 mr-2"></span>
-                <span>Critical Asset</span>
+                <span className="w-4 h-4 flex items-center justify-center">
+                  <span className="w-3 h-3 bg-white border-2 border-[#E76F51] rounded-full"></span>
+                </span>
+                <span className="ml-1">Asset at Risk</span>
               </div>
             </div>
           </div>
           
           <div className="mb-2">
-            <h5 className="text-xs font-medium mb-1">Asset Risk Classification</h5>
+            <h5 className="text-xs font-medium mb-1">Asset Risk Types</h5>
+            <div className="grid grid-cols-1 gap-y-1">
+              <div className="flex items-center">
+                <span className="w-4 h-4 flex items-center justify-center">
+                  <span className="w-3 h-3 bg-[#3B82F6] rounded-full"></span>
+                </span>
+                <span className="ml-1">Flood Risk Assets</span>
+              </div>
+              <div className="flex items-center">
+                <span className="w-4 h-4 flex items-center justify-center">
+                  <span className="w-3 h-3 bg-[#B45309] rounded-full"></span>
+                </span>
+                <span className="ml-1">Landslide Risk Assets</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mb-2">
+            <h5 className="text-xs font-medium mb-1">Combined Risk Classification</h5>
             <div className="grid grid-cols-1 gap-y-1">
               <div className="flex items-center">
                 <span className="w-5 h-3 bg-[#7E22CE] mr-2"></span>
@@ -97,12 +117,12 @@ const MapLegend: React.FC = () => {
       ) : (
         <div className="grid grid-cols-2 gap-x-2 gap-y-1">
           <div className="flex items-center">
-            <span className="w-3 h-3 bg-[#FFA500] opacity-60 mr-1"></span>
-            <span>Landslide</span>
+            <span className="w-3 h-3 bg-[#B45309] opacity-80 rounded-full mr-1"></span>
+            <span>Landslide Risk</span>
           </div>
           <div className="flex items-center">
-            <span className="w-3 h-3 bg-[#1E90FF] opacity-50 mr-1"></span>
-            <span>Flood</span>
+            <span className="w-3 h-3 bg-[#3B82F6] opacity-80 rounded-full mr-1"></span>
+            <span>Flood Risk</span>
           </div>
         </div>
       )}
