@@ -6,6 +6,7 @@ import { useAppContext } from '@/contexts/AppContext';
 import MapControls from './MapControls';
 import MapLegend from './MapLegend';
 import InfoPanel from './InfoPanel';
+import RiskDetailModal from './RiskDetailModal';
 
 const MapView: React.FC = () => {
   const { state, dispatch } = useAppContext();
@@ -14,6 +15,8 @@ const MapView: React.FC = () => {
   const [markersLayer, setMarkersLayer] = useState<L.LayerGroup | null>(null);
   const [riskZonesLayer, setRiskZonesLayer] = useState<L.LayerGroup | null>(null);
   const [isMapReady, setIsMapReady] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedRiskData, setSelectedRiskData] = useState<any>(null);
 
   // Initialize map
   useEffect(() => {
@@ -302,17 +305,16 @@ const MapView: React.FC = () => {
           }),
           onEachFeature: (feature, layer) => {
             if (feature.properties) {
-              // Create tooltip content
+              // Create a simpler tooltip content for hover
               const tooltipContent = `
                 <div class="marker-tooltip landslide-tooltip">
                   <strong>${feature.properties.neighbourhood}</strong>
                   <div class="risk-badge">Risco de Deslizamento: <span class="risk-high">ALTO</span></div>
-                  <div class="text-sm mt-1">${feature.properties.description.substring(0, 120)}...</div>
-                  <div class="tooltip-footer">Clique para mais detalhes</div>
+                  <div class="tooltip-footer">Clique para ver mais detalhes</div>
                 </div>
               `;
               
-              // Bind tooltip to layer
+              // Bind tooltip to layer (for hover)
               layer.bindTooltip(tooltipContent, {
                 direction: 'top',
                 sticky: true,
@@ -320,22 +322,24 @@ const MapView: React.FC = () => {
                 className: 'risk-zone-tooltip'
               });
 
-              // Add click handler
+              // Add click handler to open the modal
               layer.on('click', () => {
-                // Create popup with more detailed information
-                const popupContent = `
-                  <div class="risk-zone-popup">
-                    <h3 class="font-bold">${feature.properties.neighbourhood}</h3>
-                    <div class="risk-badge my-1">Risco: <span class="risk-high">${feature.properties.risk_level}</span></div>
-                    <p class="description">${feature.properties.description}</p>
-                    <p class="observation mt-2 text-sm">${feature.properties.observation}</p>
-                  </div>
-                `;
+                // Set the selected risk data
+                setSelectedRiskData({
+                  neighbourhood: feature.properties.neighbourhood,
+                  description: feature.properties.description,
+                  risk_level: feature.properties.risk_level || 'Alto',
+                  observation: feature.properties.observation,
+                  vulnerability_score: feature.properties.vulnerability_score,
+                  risk_score: feature.properties.risk_score,
+                  amount_buildings: feature.properties.amount_buildings,
+                  number_of_people: feature.properties.number_of_people,
+                  suggested_intervention: feature.properties.suggested_intervention,
+                  datasource: feature.properties.datasource
+                });
                 
-                layer.bindPopup(popupContent, { 
-                  maxWidth: 300,
-                  className: 'risk-zone-popup'
-                }).openPopup();
+                // Open the modal
+                setModalOpen(true);
               });
             }
           }
@@ -373,6 +377,15 @@ const MapView: React.FC = () => {
         <MapLegend />
         {selectedItem.id !== null && <InfoPanel />}
       </div>
+      
+      {/* Risk Detail Modal */}
+      {selectedRiskData && (
+        <RiskDetailModal 
+          isOpen={modalOpen} 
+          onClose={() => setModalOpen(false)} 
+          data={selectedRiskData} 
+        />
+      )}
     </div>
   );
 };
