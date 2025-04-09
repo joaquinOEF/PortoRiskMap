@@ -25,7 +25,7 @@ const MapView: React.FC = () => {
   // Initialize map
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     // Create map instance
     const mapInstance = L.map('map', {
       center: [state.mapView.center.lat, state.mapView.center.lng],
@@ -46,11 +46,11 @@ const MapView: React.FC = () => {
 
     // Create new markers layer
     const newMarkersLayer = L.layerGroup().addTo(mapInstance);
-    
+
     // Set state
     setMap(mapInstance);
     setMarkersLayer(newMarkersLayer);
-    
+
     // Wait for map to be ready
     mapInstance.whenReady(() => {
       setIsMapReady(true);
@@ -64,7 +64,7 @@ const MapView: React.FC = () => {
   // Load critical assets from OpenStreetMap
   useEffect(() => {
     if (!isMapReady) return;
-    
+
     const loadAssets = async () => {
       try {
         setAssetsLoading(true);
@@ -76,7 +76,7 @@ const MapView: React.FC = () => {
         setAssetsLoading(false);
       }
     };
-    
+
     loadAssets();
   }, [isMapReady]);
 
@@ -84,20 +84,20 @@ const MapView: React.FC = () => {
   useEffect(() => {
     if (map && markersLayer && assets.length > 0) {
       markersLayer.clearLayers();
-      
+
       // Filter assets based on the selected asset risk types 
       const filteredAssets = assets.filter(asset => {
         // Check hazard type filters - we only show medium and high risk assets
         const floodVisible = filters.showFloodRisk && 
           (asset.floodRisk === 'high' || asset.floodRisk === 'medium');
-          
+
         const landslideVisible = filters.showLandslideRisk && 
           (asset.landslideRisk === 'high' || asset.landslideRisk === 'medium');
-        
+
         // Asset passes if it meets at least one of the selected hazard type filters
         return floodVisible || landslideVisible;
       });
-      
+
       // Add filtered assets to the map
       filteredAssets.forEach(asset => {
         // Determine color based on the highest risk level
@@ -108,10 +108,10 @@ const MapView: React.FC = () => {
               ? 'medium'
               : 'low'
         );
-        
+
         // Get the appropriate SVG paths for the asset type
         const svgPaths = getAssetIconSVG(asset.type);
-        
+
         // Create the custom HTML for the icon
         const html = `
           <div style="background-color: white; border-radius: 50%; padding: 3px; border: 2px solid ${color}">
@@ -120,7 +120,7 @@ const MapView: React.FC = () => {
             </svg>
           </div>
         `;
-        
+
         // Create the icon
         const icon = L.divIcon({
           className: 'custom-asset-marker',
@@ -128,23 +128,23 @@ const MapView: React.FC = () => {
           iconSize: [28, 28],
           iconAnchor: [14, 14]
         });
-        
+
         // Create marker and add to map
         const marker = L.marker([asset.location.lat, asset.location.lng], { icon }).addTo(markersLayer!);
-        
+
         // Calculate combined risk level for display
         const getCombinedRiskLabel = (asset: Asset): string => {
           const floodValue = asset.floodRisk === 'high' ? 3 : asset.floodRisk === 'medium' ? 2 : 1;
           const landslideValue = asset.landslideRisk === 'high' ? 3 : asset.landslideRisk === 'medium' ? 2 : 1;
           const combinedScore = floodValue + landslideValue;
-          
+
           if (combinedScore >= 6) return 'Critical Risk';
           if (combinedScore >= 5) return 'Severe Risk';
           if (combinedScore >= 4) return 'High Risk';
           if (combinedScore >= 3) return 'Moderate Risk';
           return 'Low Risk';
         };
-        
+
         // Create tooltip content for assets
         const tooltipContent = `
           <div class="marker-tooltip">
@@ -157,13 +157,13 @@ const MapView: React.FC = () => {
             </div>
           </div>
         `;
-        
+
         // Add tooltip to marker
         marker.bindTooltip(tooltipContent, { 
           direction: 'top',
           offset: L.point(0, -8)
         });
-        
+
         // Add click handler to select this asset
         marker.on('click', () => {
           dispatch({
@@ -186,7 +186,7 @@ const MapView: React.FC = () => {
     const loadBackgroundLayers = async () => {
       try {
         console.log("Loading GeoJSON risk zone data...");
-        
+
         // Load landslide risk zones first (bottom layer)
         // --------- Low risk landslide zones ---------
         const landslideRiskLowResponse = await fetch('/data/landslide_low.geojson');
@@ -203,7 +203,7 @@ const MapView: React.FC = () => {
             // No tooltip or click handlers for background layers
           }
         }).addTo(riskZonesGroup);
-        
+
         // --------- Medium risk landslide zones ---------
         const landslideRiskMediumResponse = await fetch('/data/landslide_medium.geojson');
         const landslideRiskMediumData = await landslideRiskMediumResponse.json();
@@ -219,7 +219,7 @@ const MapView: React.FC = () => {
             // No tooltip or click handlers for background layers
           }
         }).addTo(riskZonesGroup);
-        
+
         // --------- High risk landslide zones ---------
         const landslideRiskHighResponse = await fetch('/data/landslide_high.geojson');
         const landslideRiskHighData = await landslideRiskHighResponse.json();
@@ -235,7 +235,7 @@ const MapView: React.FC = () => {
             // No tooltip or click handlers for background layers
           }
         }).addTo(riskZonesGroup);
-        
+
         // Now load the flood risk zones on top of landslide zones
         // --------- Low risk flood zones ---------
         const floodRiskLowResponse = await fetch('/data/flooding_low.geojson');
@@ -252,7 +252,7 @@ const MapView: React.FC = () => {
             // No tooltip or click handlers for background layers
           }
         }).addTo(riskZonesGroup);
-        
+
         // --------- Medium risk flood zones ---------
         const floodRiskMediumResponse = await fetch('/data/flooding_medium.geojson');
         const floodRiskMediumData = await floodRiskMediumResponse.json();
@@ -268,7 +268,7 @@ const MapView: React.FC = () => {
             // No tooltip or click handlers for background layers
           }
         }).addTo(riskZonesGroup);
-        
+
         // --------- High risk flood zones ---------
         const floodRiskHighResponse = await fetch('/data/flooding_high.geojson');
         const floodRiskHighData = await floodRiskHighResponse.json();
@@ -284,7 +284,7 @@ const MapView: React.FC = () => {
             // No tooltip or click handlers for background layers
           }
         }).addTo(riskZonesGroup);
-        
+
         // Finally load the interactive deslizamento_alto data as the top layer
         const detailedResponse = await fetch('/data/deslizamento_alto.geojson');
         const detailedData = await detailedResponse.json();
@@ -308,7 +308,7 @@ const MapView: React.FC = () => {
                 feature.properties.risk_score?.includes('Muito alto') ? 'risk-very-high' : 
                 feature.properties.risk_score?.includes('Alto') ? 'risk-high' : 
                 feature.properties.risk_score?.includes('Médio') ? 'risk-medium' : 'risk-low';
-                
+
               // Create a simpler tooltip content for hover
               const tooltipContent = `
                 <div class="marker-tooltip landslide-tooltip">
@@ -317,7 +317,7 @@ const MapView: React.FC = () => {
                   <div class="tooltip-footer">Clique para ver mais detalhes</div>
                 </div>
               `;
-              
+
               // Bind tooltip to layer (for hover)
               layer.bindTooltip(tooltipContent, {
                 direction: 'top',
@@ -341,19 +341,19 @@ const MapView: React.FC = () => {
                   suggested_intervention: feature.properties.suggested_intervention,
                   datasource: feature.properties.datasource
                 });
-                
+
                 // Open the modal
                 setModalOpen(true);
               });
             }
           }
         }).addTo(riskZonesGroup);
-        
+
       } catch (error) {
         console.error("Error loading GeoJSON data:", error);
       }
     };
-    
+
     // Execute the async function to load layers in sequence
     loadBackgroundLayers();
 
@@ -384,7 +384,7 @@ const MapView: React.FC = () => {
         {/* Position MapLegend as a direct child of the container div for better positioning */}
         <MapLegend />
       </div>
-      
+
       {/* Risk Detail Modal - rendered at the root level for proper z-index stacking */}
       {selectedRiskData && (
         <RiskDetailModal 
