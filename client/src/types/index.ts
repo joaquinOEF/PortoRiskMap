@@ -5,7 +5,7 @@ export interface LatLng {
 }
 
 // Risk levels
-export type RiskLevel = "high" | "medium" | "low";
+export type RiskLevel = "very-high" | "high" | "medium" | "low";
 
 // Asset types
 export type AssetType = "healthcare" | "financial" | "transportation" | "cultural" | "utility" | "education" | "other";

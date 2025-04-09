@@ -65,6 +65,11 @@
   border-radius: 4px;
 }
 
+.risk-very-high {
+  color: #7E22CE; /* Deep purple for "Muito alto" */
+  font-weight: 600;
+}
+
 .risk-high {
   color: #E76F51;
   font-weight: 600;

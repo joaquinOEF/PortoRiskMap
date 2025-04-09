@@ -295,19 +295,23 @@ const MapView: React.FC = () => {
         const detailedResponse = await fetch('/data/deslizamento_alto.geojson');
         const detailedData = await detailedResponse.json();
         L.geoJSON(detailedData, {
-          style: () => ({
-            color: '#DC2626', // Bright red for more detailed high risk areas
-            weight: 2,
-            opacity: 0.9,
-            fillColor: '#DC2626',
-            fillOpacity: 0.4,
-            dashArray: '2'
-          }),
+          style: (feature) => {
+            // Use deep purple for "Muito alto" risk and red for "Alto" risk
+            const isMuitoAlto = feature?.properties?.risk_score?.includes('Muito alto');
+            return {
+              color: isMuitoAlto ? '#7E22CE' : '#DC2626', // Deep purple for "Muito alto", bright red for "Alto"
+              weight: 2,
+              opacity: 0.9,
+              fillColor: isMuitoAlto ? '#7E22CE' : '#DC2626',
+              fillOpacity: 0.4,
+              dashArray: '2'
+            };
+          },
           onEachFeature: (feature, layer) => {
             if (feature.properties) {
               // Get the risk class for styling
               const riskClass = 
-                feature.properties.risk_score?.includes('Muito alto') ? 'risk-high' : 
+                feature.properties.risk_score?.includes('Muito alto') ? 'risk-very-high' : 
                 feature.properties.risk_score?.includes('Alto') ? 'risk-high' : 
                 feature.properties.risk_score?.includes('Médio') ? 'risk-medium' : 'risk-low';
                 

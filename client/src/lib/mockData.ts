@@ -189,6 +189,8 @@ export const historicalEvents: HistoricalEvent[] = [
 // Helper functions
 export const getRiskColor = (risk: RiskLevel): string => {
   switch (risk) {
+    case "very-high":
+      return "#7E22CE"; // risk-very-high (Deep purple)
     case "high":
       return "#E76F51"; // risk-high
     case "medium":

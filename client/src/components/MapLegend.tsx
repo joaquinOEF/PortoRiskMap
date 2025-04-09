@@ -10,6 +10,10 @@ const MapLegend: React.FC = () => {
         <h5 className="text-xs font-medium mb-1">Map Elements</h5>
         <div className="grid grid-cols-2 gap-x-4 gap-y-1">
           <div className="flex items-center">
+            <RiskIndicator risk="very-high" />
+            <span>Very High Risk</span>
+          </div>
+          <div className="flex items-center">
             <RiskIndicator risk="high" />
             <span>High Risk</span>
           </div>
@@ -46,8 +50,12 @@ const MapLegend: React.FC = () => {
             <span>Low Landslide Risk</span>
           </div>
           <div className="flex items-center">
+            <span className="w-5 h-3 border border-[#7E22CE] bg-[#7E22CE] opacity-70 mr-2" style={{ borderStyle: 'dashed' }}></span>
+            <span>Very High Risk (Muito alto)</span>
+          </div>
+          <div className="flex items-center">
             <span className="w-5 h-3 border border-[#DC2626] bg-[#DC2626] opacity-70 mr-2" style={{ borderStyle: 'dashed' }}></span>
-            <span>Detailed High Risk</span>
+            <span>High Risk (Alto)</span>
           </div>
         </div>
       </div>
