@@ -247,7 +247,7 @@ const MapView: React.FC = () => {
     }
   }, [map, markersLayer, filters, dispatch, assets]);
 
-  // Load and display GeoJSON landslide risk zones
+  // Load and display GeoJSON risk zones
   useEffect(() => {
     if (!map || !isMapReady) return;
 
@@ -257,10 +257,14 @@ const MapView: React.FC = () => {
     // First load all the background risk zones (non-interactive)
     const loadBackgroundLayers = async () => {
       try {
-        // Load low risk landslide zones first (bottom layer)
-        const lowRiskResponse = await fetch('/data/landslide_low.geojson');
-        const lowRiskData = await lowRiskResponse.json();
-        L.geoJSON(lowRiskData, {
+        console.log("Loading GeoJSON risk zone data...");
+        
+        // Load landslide risk zones first (bottom layer)
+        // --------- Low risk landslide zones ---------
+        const landslideRiskLowResponse = await fetch('/data/landslide_low.geojson');
+        const landslideRiskLowData = await landslideRiskLowResponse.json();
+        console.log("Loaded", landslideRiskLowData.features.length, "low risk landslide zones");
+        L.geoJSON(landslideRiskLowData, {
           style: () => ({
             color: 'none', // No border
             weight: 0,
@@ -272,10 +276,11 @@ const MapView: React.FC = () => {
           }
         }).addTo(riskZonesGroup);
         
-        // Load medium risk landslide zones next
-        const mediumRiskResponse = await fetch('/data/landslide_medium.geojson');
-        const mediumRiskData = await mediumRiskResponse.json();
-        L.geoJSON(mediumRiskData, {
+        // --------- Medium risk landslide zones ---------
+        const landslideRiskMediumResponse = await fetch('/data/landslide_medium.geojson');
+        const landslideRiskMediumData = await landslideRiskMediumResponse.json();
+        console.log("Loaded", landslideRiskMediumData.features.length, "medium risk landslide zones");
+        L.geoJSON(landslideRiskMediumData, {
           style: () => ({
             color: 'none', // No border
             weight: 0,
@@ -287,15 +292,65 @@ const MapView: React.FC = () => {
           }
         }).addTo(riskZonesGroup);
         
-        // Load high risk landslide zones next
-        const highRiskResponse = await fetch('/data/landslide_high.geojson');
-        const highRiskData = await highRiskResponse.json();
-        L.geoJSON(highRiskData, {
+        // --------- High risk landslide zones ---------
+        const landslideRiskHighResponse = await fetch('/data/landslide_high.geojson');
+        const landslideRiskHighData = await landslideRiskHighResponse.json();
+        console.log("Loaded", landslideRiskHighData.features.length, "high risk landslide zones");
+        L.geoJSON(landslideRiskHighData, {
           style: () => ({
             color: 'none', // No border
             weight: 0,
             fillColor: '#FFA500', // Orange for high risk
             fillOpacity: 0.6,
+          }),
+          onEachFeature: (feature, layer) => {
+            // No tooltip or click handlers for background layers
+          }
+        }).addTo(riskZonesGroup);
+        
+        // Now load the flood risk zones on top of landslide zones
+        // --------- Low risk flood zones ---------
+        const floodRiskLowResponse = await fetch('/data/flooding_low.geojson');
+        const floodRiskLowData = await floodRiskLowResponse.json();
+        console.log("Loaded", floodRiskLowData.features.length, "low risk flood zones");
+        L.geoJSON(floodRiskLowData, {
+          style: () => ({
+            color: 'none', // No border
+            weight: 0,
+            fillColor: '#ADD8E6', // Light blue for low risk
+            fillOpacity: 0.5,
+          }),
+          onEachFeature: (feature, layer) => {
+            // No tooltip or click handlers for background layers
+          }
+        }).addTo(riskZonesGroup);
+        
+        // --------- Medium risk flood zones ---------
+        const floodRiskMediumResponse = await fetch('/data/flooding_medium.geojson');
+        const floodRiskMediumData = await floodRiskMediumResponse.json();
+        console.log("Loaded", floodRiskMediumData.features.length, "medium risk flood zones");
+        L.geoJSON(floodRiskMediumData, {
+          style: () => ({
+            color: 'none', // No border
+            weight: 0,
+            fillColor: '#1E90FF', // Blue for medium risk
+            fillOpacity: 0.5,
+          }),
+          onEachFeature: (feature, layer) => {
+            // No tooltip or click handlers for background layers
+          }
+        }).addTo(riskZonesGroup);
+        
+        // --------- High risk flood zones ---------
+        const floodRiskHighResponse = await fetch('/data/flooding_high.geojson');
+        const floodRiskHighData = await floodRiskHighResponse.json();
+        console.log("Loaded", floodRiskHighData.features.length, "high risk flood zones");
+        L.geoJSON(floodRiskHighData, {
+          style: () => ({
+            color: 'none', // No border
+            weight: 0,
+            fillColor: '#000080', // Dark blue for high risk
+            fillOpacity: 0.5,
           }),
           onEachFeature: (feature, layer) => {
             // No tooltip or click handlers for background layers
