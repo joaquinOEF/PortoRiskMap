@@ -1,6 +1,6 @@
 import React from 'react';
 import { AssetType } from '@/types';
-import { getAssetIconSVG } from '@/lib/mockData';
+import { getAssetIconSVG } from '@/lib/mapUtils';
 
 interface AssetIconProps {
   assetType: AssetType;

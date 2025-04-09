@@ -22,16 +22,30 @@ const MapLegend: React.FC = () => {
             <h5 className="text-xs font-medium mb-1">Map Elements</h5>
             <div className="grid grid-cols-1 gap-y-1">
               <div className="flex items-center">
-                <span className="w-3 h-3 border-2 border-white bg-gray-800 rounded-full mr-2"></span>
-                <span>Neighborhood</span>
-              </div>
-              <div className="flex items-center">
                 <span className="w-3 h-3 border-2 border-white bg-gray-800 transform rotate-45 mr-2"></span>
                 <span>Critical Asset</span>
               </div>
+            </div>
+          </div>
+          
+          <div className="mb-2">
+            <h5 className="text-xs font-medium mb-1">Asset Risk Classification</h5>
+            <div className="grid grid-cols-1 gap-y-1">
               <div className="flex items-center">
-                <span className="w-3 h-3 border-2 border-white bg-[#F4A261] rounded-full mr-2"></span>
-                <span>Past Event</span>
+                <span className="w-5 h-3 bg-[#7E22CE] mr-2"></span>
+                <span>Critical Risk</span>
+              </div>
+              <div className="flex items-center">
+                <span className="w-5 h-3 bg-[#E76F51] mr-2"></span>
+                <span>Severe Risk</span>
+              </div>
+              <div className="flex items-center">
+                <span className="w-5 h-3 bg-[#F4A261] mr-2"></span>
+                <span>High Risk</span>
+              </div>
+              <div className="flex items-center">
+                <span className="w-5 h-3 bg-[#2A9D8F] mr-2"></span>
+                <span>Moderate/Low Risk</span>
               </div>
             </div>
           </div>

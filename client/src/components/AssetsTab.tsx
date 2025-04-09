@@ -1,10 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useAppContext } from "@/contexts/AppContext";
-import { getAssetTypeLabel, getRiskColor } from "@/lib/mockData";
+import { getRiskColor } from "@/lib/mapUtils";
 import { fetchCriticalAssets } from "@/lib/osmService";
-import { Asset, RiskLevel } from "@/types";
+import { Asset, RiskLevel, AssetType } from "@/types";
 import RiskIndicator from "./RiskIndicator";
 import AssetIcon from "./AssetIcon";
+
+// Helper function to get human-readable asset type labels
+const getAssetTypeLabel = (type: AssetType): string => {
+  switch (type) {
+    case 'healthcare': return 'Healthcare';
+    case 'financial': return 'Financial';
+    case 'transportation': return 'Transport';
+    case 'cultural': return 'Cultural';
+    case 'utility': return 'Utility';
+    case 'education': return 'Education';
+    case 'other':
+    default: return 'Other';
+  }
+};
 
 const AssetsTab: React.FC = () => {
   const { state, dispatch } = useAppContext();

@@ -1,6 +1,6 @@
 import React from "react";
 import { RiskLevel } from "@/types";
-import { getRiskColor } from "@/lib/mockData";
+import { getRiskColor } from "@/lib/mapUtils";
 
 interface RiskIndicatorProps {
   risk: RiskLevel;

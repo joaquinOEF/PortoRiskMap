@@ -3,6 +3,7 @@ import { useAppContext } from "@/contexts/AppContext";
 import RiskIndicator from "./RiskIndicator";
 import { Users, HelpCircle, Building, AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getRiskColor } from "@/lib/mapUtils";
 
 interface LandslideRiskArea {
   type: string;

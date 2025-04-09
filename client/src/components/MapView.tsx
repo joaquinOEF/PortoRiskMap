@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { neighborhoods, historicalEvents, getRiskColor, getAssetIconSVG } from '@/lib/mockData';
 import { fetchCriticalAssets } from '@/lib/osmService';
 import { useAppContext } from '@/contexts/AppContext';
 import { Asset } from '@/types';
+import { getRiskColor, getAssetIconSVG } from '@/lib/mapUtils';
 import MapControls from './MapControls';
 import MapLegend from './MapLegend';
 import InfoPanel from './InfoPanel';
@@ -82,165 +82,95 @@ const MapView: React.FC = () => {
 
   // Update markers when filters change
   useEffect(() => {
-    if (map && markersLayer) {
+    if (map && markersLayer && assets.length > 0) {
       markersLayer.clearLayers();
       
-      // Add neighborhood markers
-      neighborhoods
-        .filter(n => {
-          const floodVisible = 
-            (n.floodRisk === 'high' && filters.showHigh) ||
-            (n.floodRisk === 'medium' && filters.showMedium) ||
-            (n.floodRisk === 'low' && filters.showLow);
-          
-          const landslideVisible = 
-            (n.landslideRisk === 'high' && filters.showHigh) ||
-            (n.landslideRisk === 'medium' && filters.showMedium) ||
-            (n.landslideRisk === 'low' && filters.showLow);
-            
-          return floodVisible || landslideVisible;
-        })
-        .forEach(n => {
-          const color = getRiskColor(n.floodRisk);
-          const marker = L.circleMarker([n.location.lat, n.location.lng], {
-            radius: 8,
-            fillColor: color,
-            color: '#fff',
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.8
-          }).addTo(markersLayer!);
-          
-          // Create tooltip content
-          const tooltipContent = `
-            <div class="marker-tooltip">
-              <strong>${n.name}</strong>
-              <div>Population at risk: ${n.populationAtRisk.toLocaleString()}</div>
-              <div class="tooltip-risks">
-                <span>Flood: <span class="capitalize" style="color: ${getRiskColor(n.floodRisk)}">${n.floodRisk}</span></span>
-                <span>Landslide: <span class="capitalize" style="color: ${getRiskColor(n.landslideRisk)}">${n.landslideRisk}</span></span>
-              </div>
-            </div>
-          `;
-          
-          // Add tooltip to marker
-          marker.bindTooltip(tooltipContent, { 
-            direction: 'top',
-            offset: L.point(0, -5)
-          });
-          
-          marker.on('click', () => {
-            dispatch({
-              type: 'SELECT_ITEM',
-              payload: { type: 'neighborhood', id: n.id }
-            });
-          });
-        });
-
-      // Add asset markers
-      assets
-        .filter(a => {
-          const floodVisible = 
-            (a.floodRisk === 'high' && filters.showHigh) ||
-            (a.floodRisk === 'medium' && filters.showMedium) ||
-            (a.floodRisk === 'low' && filters.showLow);
-          
-          const landslideVisible = 
-            (a.landslideRisk === 'high' && filters.showHigh) ||
-            (a.landslideRisk === 'medium' && filters.showMedium) ||
-            (a.landslideRisk === 'low' && filters.showLow);
-            
-          return floodVisible || landslideVisible;
-        })
-        .forEach(a => {
-          const color = getRiskColor(a.floodRisk);
-          
-          // Get the appropriate SVG paths for the asset type
-          const svgPaths = getAssetIconSVG(a.type);
-          
-          // Create the custom HTML for the icon
-          const html = `
-            <div style="background-color: white; border-radius: 50%; padding: 3px; border: 2px solid ${color}">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                ${svgPaths}
-              </svg>
-            </div>
-          `;
-          
-          // Create the icon
-          const icon = L.divIcon({
-            className: 'custom-asset-marker',
-            html: html,
-            iconSize: [28, 28],
-            iconAnchor: [14, 14]
-          });
-          
-          // Create marker
-          const marker = L.marker([a.location.lat, a.location.lng], { icon }).addTo(markersLayer!);
-          
-          // Create tooltip content for assets
-          const tooltipContent = `
-            <div class="marker-tooltip">
-              <strong>${a.name}</strong>
-              <div>Type: <span class="capitalize">${a.type}</span></div>
-              <div class="tooltip-risks">
-                <span>Flood: <span class="capitalize" style="color: ${getRiskColor(a.floodRisk)}">${a.floodRisk}</span></span>
-                <span>Landslide: <span class="capitalize" style="color: ${getRiskColor(a.landslideRisk)}">${a.landslideRisk}</span></span>
-              </div>
-            </div>
-          `;
-          
-          // Add tooltip to marker
-          marker.bindTooltip(tooltipContent, { 
-            direction: 'top',
-            offset: L.point(0, -8)
-          });
-          
-          marker.on('click', () => {
-            dispatch({
-              type: 'SELECT_ITEM',
-              payload: { type: 'asset', id: a.id }
-            });
-          });
-        });
-
-      // Add event markers
-      historicalEvents.forEach(e => {
-        const marker = L.circleMarker([e.location.lat, e.location.lng], {
-          radius: 7,
-          fillColor: '#F4A261', // accent color
-          color: '#fff',
-          weight: 2,
-          opacity: 1,
-          fillOpacity: 0.8
-        }).addTo(markersLayer!);
+      // Filter assets based on their risk levels and current filter settings
+      const filteredAssets = assets.filter(asset => {
+        const floodVisible = 
+          (asset.floodRisk === 'high' && filters.showHigh) ||
+          (asset.floodRisk === 'medium' && filters.showMedium) ||
+          (asset.floodRisk === 'low' && filters.showLow);
         
-        // Format date for tooltip
-        const formatDate = (dateString: string) => {
-          const date = new Date(dateString);
-          return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const landslideVisible = 
+          (asset.landslideRisk === 'high' && filters.showHigh) ||
+          (asset.landslideRisk === 'medium' && filters.showMedium) ||
+          (asset.landslideRisk === 'low' && filters.showLow);
+          
+        return floodVisible || landslideVisible;
+      });
+      
+      // Add filtered assets to the map
+      filteredAssets.forEach(asset => {
+        // Determine color based on the highest risk level
+        const color = getRiskColor(
+          asset.floodRisk === 'high' || asset.landslideRisk === 'high' 
+            ? 'high' 
+            : asset.floodRisk === 'medium' || asset.landslideRisk === 'medium'
+              ? 'medium'
+              : 'low'
+        );
+        
+        // Get the appropriate SVG paths for the asset type
+        const svgPaths = getAssetIconSVG(asset.type);
+        
+        // Create the custom HTML for the icon
+        const html = `
+          <div style="background-color: white; border-radius: 50%; padding: 3px; border: 2px solid ${color}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              ${svgPaths}
+            </svg>
+          </div>
+        `;
+        
+        // Create the icon
+        const icon = L.divIcon({
+          className: 'custom-asset-marker',
+          html: html,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14]
+        });
+        
+        // Create marker and add to map
+        const marker = L.marker([asset.location.lat, asset.location.lng], { icon }).addTo(markersLayer!);
+        
+        // Calculate combined risk level for display
+        const getCombinedRiskLabel = (asset: Asset): string => {
+          const floodValue = asset.floodRisk === 'high' ? 3 : asset.floodRisk === 'medium' ? 2 : 1;
+          const landslideValue = asset.landslideRisk === 'high' ? 3 : asset.landslideRisk === 'medium' ? 2 : 1;
+          const combinedScore = floodValue + landslideValue;
+          
+          if (combinedScore >= 6) return 'Critical Risk';
+          if (combinedScore >= 5) return 'Severe Risk';
+          if (combinedScore >= 4) return 'High Risk';
+          if (combinedScore >= 3) return 'Moderate Risk';
+          return 'Low Risk';
         };
         
-        // Create tooltip content for events
+        // Create tooltip content for assets
         const tooltipContent = `
           <div class="marker-tooltip">
-            <strong>${e.title}</strong>
-            <div>${formatDate(e.date)}</div>
-            <div>Type: <span class="capitalize">${e.type}</span></div>
-            <div class="text-xs">Click for details</div>
+            <strong>${asset.name}</strong>
+            <div>Type: <span class="capitalize">${asset.type}</span></div>
+            <div class="font-semibold">${getCombinedRiskLabel(asset)}</div>
+            <div class="tooltip-risks">
+              <span>Flood: <span class="capitalize" style="color: ${getRiskColor(asset.floodRisk)}">${asset.floodRisk}</span></span>
+              <span>Landslide: <span class="capitalize" style="color: ${getRiskColor(asset.landslideRisk)}">${asset.landslideRisk}</span></span>
+            </div>
           </div>
         `;
         
         // Add tooltip to marker
         marker.bindTooltip(tooltipContent, { 
           direction: 'top',
-          offset: L.point(0, -5)
+          offset: L.point(0, -8)
         });
         
+        // Add click handler to select this asset
         marker.on('click', () => {
           dispatch({
             type: 'SELECT_ITEM',
-            payload: { type: 'event', id: e.id }
+            payload: { type: 'asset', id: asset.id }
           });
         });
       });
