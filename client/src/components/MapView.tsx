@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { neighborhoods, assets, historicalEvents, getRiskColor, getAssetIconSVG } from '@/lib/mockData';
+import { neighborhoods, historicalEvents, getRiskColor, getAssetIconSVG } from '@/lib/mockData';
+import { fetchCriticalAssets } from '@/lib/osmService';
 import { useAppContext } from '@/contexts/AppContext';
+import { Asset } from '@/types';
 import MapControls from './MapControls';
 import MapLegend from './MapLegend';
 import InfoPanel from './InfoPanel';
@@ -17,6 +19,8 @@ const MapView: React.FC = () => {
   const [isMapReady, setIsMapReady] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRiskData, setSelectedRiskData] = useState<any>(null);
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [assetsLoading, setAssetsLoading] = useState<boolean>(true);
 
   // Initialize map
   useEffect(() => {
@@ -57,17 +61,24 @@ const MapView: React.FC = () => {
     };
   }, []);
 
-  // We've removed the grid overlay in favor of real GeoJSON data
-  // This effect used to add the grid overlay, but now it's empty
+  // Load critical assets from OpenStreetMap
   useEffect(() => {
-    if (!map || !isMapReady) return;
+    if (!isMapReady) return;
     
-    // No grid overlay is added anymore
-    
-    return () => {
-      // Cleanup function is empty since we don't add any layer
+    const loadAssets = async () => {
+      try {
+        setAssetsLoading(true);
+        const osmAssets = await fetchCriticalAssets();
+        setAssets(osmAssets);
+      } catch (err) {
+        console.error('Error loading critical assets:', err);
+      } finally {
+        setAssetsLoading(false);
+      }
     };
-  }, [map, isMapReady]);
+    
+    loadAssets();
+  }, [isMapReady]);
 
   // Update markers when filters change
   useEffect(() => {
@@ -234,7 +245,7 @@ const MapView: React.FC = () => {
         });
       });
     }
-  }, [map, markersLayer, filters, dispatch]);
+  }, [map, markersLayer, filters, dispatch, assets]);
 
   // Load and display GeoJSON landslide risk zones
   useEffect(() => {

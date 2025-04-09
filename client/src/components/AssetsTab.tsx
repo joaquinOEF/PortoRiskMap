@@ -1,12 +1,36 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useAppContext } from "@/contexts/AppContext";
-import { assets, getAssetTypeLabel, getRiskColor } from "@/lib/mockData";
+import { getAssetTypeLabel, getRiskColor } from "@/lib/mockData";
+import { fetchCriticalAssets } from "@/lib/osmService";
+import { Asset, RiskLevel } from "@/types";
 import RiskIndicator from "./RiskIndicator";
 import AssetIcon from "./AssetIcon";
 
 const AssetsTab: React.FC = () => {
   const { state, dispatch } = useAppContext();
   const { filters } = state;
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Fetch assets from OpenStreetMap on component mount
+  useEffect(() => {
+    const loadAssets = async () => {
+      try {
+        setLoading(true);
+        const osmAssets = await fetchCriticalAssets();
+        setAssets(osmAssets);
+        setError(null);
+      } catch (err) {
+        console.error('Error loading critical assets:', err);
+        setError('Failed to load critical assets. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadAssets();
+  }, []);
   
   // Filter assets based on current filters
   const filteredAssets = assets.filter(a => {
@@ -24,23 +48,24 @@ const AssetsTab: React.FC = () => {
   })
   // Sort by risk level (high to low)
   .sort((a, b) => {
-    // Risk level priority: high (3) > medium (2) > low (1)
-    const riskLevelValue = (risk: 'high' | 'medium' | 'low') => {
+    // Risk level priority: very-high (4) > high (3) > medium (2) > low (1)
+    const riskLevelValue = (risk: RiskLevel): number => {
+      if (risk === 'very-high') return 4;
       if (risk === 'high') return 3;
       if (risk === 'medium') return 2;
       return 1;
     };
     
-    // First sort by flood risk
-    const aFloodValue = riskLevelValue(a.floodRisk);
-    const bFloodValue = riskLevelValue(b.floodRisk);
+    // Sort primarily by landslide risk since we're focusing on landslide data
+    const aLandslideValue = riskLevelValue(a.landslideRisk);
+    const bLandslideValue = riskLevelValue(b.landslideRisk);
     
-    if (aFloodValue !== bFloodValue) {
-      return bFloodValue - aFloodValue; // Descending order
+    if (aLandslideValue !== bLandslideValue) {
+      return bLandslideValue - aLandslideValue; // Descending order
     }
     
-    // If flood risks are equal, sort by landslide risk
-    return riskLevelValue(b.landslideRisk) - riskLevelValue(a.landslideRisk);
+    // If landslide risks are equal, sort by flood risk
+    return riskLevelValue(b.floodRisk) - riskLevelValue(a.floodRisk);
   });
   
   const handleAssetClick = (id: number) => {
@@ -61,6 +86,43 @@ const AssetsTab: React.FC = () => {
     }
   };
   
+  if (loading) {
+    return (
+      <div className="p-4">
+        <div className="flex justify-between mb-4">
+          <h3 className="font-semibold">Critical Assets at Risk</h3>
+          <span className="text-sm text-neutral-700">Loading...</span>
+        </div>
+        <div className="space-y-3">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="animate-pulse">
+              <div className="bg-gray-200 h-16 rounded"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="p-4">
+        <div className="flex justify-between mb-4">
+          <h3 className="font-semibold">Critical Assets at Risk</h3>
+        </div>
+        <div className="bg-white rounded shadow-sm p-4 mb-3 text-center text-red-500">
+          <p>{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-2 bg-primary text-white px-3 py-1 rounded text-sm"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="p-4">
       <div className="flex justify-between mb-4">
@@ -74,8 +136,8 @@ const AssetsTab: React.FC = () => {
           className={`bg-white rounded shadow-sm p-3 mb-3 border-l-4 hover:shadow-md transition duration-200 cursor-pointer`}
           onClick={() => handleAssetClick(asset.id)}
           style={{ 
-            borderLeftColor: asset.floodRisk === 'high' ? '#E76F51' : 
-                            asset.floodRisk === 'medium' ? '#F4A261' : '#2A9D8F' 
+            borderLeftColor: asset.landslideRisk === 'high' ? '#E76F51' : 
+                            asset.landslideRisk === 'medium' ? '#F4A261' : '#2A9D8F' 
           }}
         >
           <div className="flex justify-between">
