@@ -371,14 +371,16 @@ const MapView: React.FC = () => {
   }, [map, state.mapView]);
 
   return (
-    <div className="md:w-2/3 lg:w-3/4 relative order-1 md:order-2 h-[60vh] md:h-auto">
-      <div id="map" className="w-full h-full bg-gray-200 relative">
-        <MapControls map={map} />
-        <MapLegend />
-        {selectedItem.id !== null && <InfoPanel />}
+    <>
+      <div className="md:w-2/3 lg:w-3/4 relative order-1 md:order-2 h-[60vh] md:h-auto">
+        <div id="map" className="w-full h-full bg-gray-200 relative">
+          <MapControls map={map} />
+          <MapLegend />
+          {selectedItem.id !== null && <InfoPanel />}
+        </div>
       </div>
       
-      {/* Risk Detail Modal */}
+      {/* Risk Detail Modal - rendered at the root level for proper z-index stacking */}
       {selectedRiskData && (
         <RiskDetailModal 
           isOpen={modalOpen} 
@@ -386,7 +388,7 @@ const MapView: React.FC = () => {
           data={selectedRiskData} 
         />
       )}
-    </div>
+    </>
   );
 };
 
