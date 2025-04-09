@@ -44,15 +44,14 @@ const MapView: React.FC = () => {
       opacity: 0.3
     }).addTo(mapInstance);
 
-    // Create new markers layer
-    const newMarkersLayer = L.layerGroup().addTo(mapInstance);
-
-    // Set state
-    setMap(mapInstance);
-    setMarkersLayer(newMarkersLayer);
-
-    // Wait for map to be ready
+    // Wait for map to be ready before adding layers
     mapInstance.whenReady(() => {
+      // Create new markers layer
+      const newMarkersLayer = L.layerGroup().addTo(mapInstance);
+
+      // Set state
+      setMap(mapInstance);
+      setMarkersLayer(newMarkersLayer);
       setIsMapReady(true);
     });
 
