@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { AssetType } from '@/types';
-import { getAssetIconSVG } from '@/lib/mapUtils';
+import { HeartPulse, Building2, Car, Landmark, Zap, School, HelpCircle } from 'lucide-react';
 
 interface AssetIconProps {
   assetType: AssetType;
@@ -15,25 +16,28 @@ const AssetIcon: React.FC<AssetIconProps> = ({
   color = "currentColor",
   size = 16 
 }) => {
-  const iconPaths = getAssetIconSVG(assetType);
-  
-  return (
-    <div className={`inline-flex items-center justify-center ${className}`}>
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        width={size} 
-        height={size} 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke={color} 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round"
-      >
-        {iconPaths && <g dangerouslySetInnerHTML={{ __html: iconPaths }} />}
-      </svg>
-    </div>
-  );
+  const iconProps = {
+    size,
+    color,
+    className
+  };
+
+  switch (assetType) {
+    case 'healthcare':
+      return <HeartPulse {...iconProps} />;
+    case 'financial':
+      return <Building2 {...iconProps} />;
+    case 'transportation':
+      return <Car {...iconProps} />;
+    case 'cultural':
+      return <Landmark {...iconProps} />;
+    case 'utility':
+      return <Zap {...iconProps} />;
+    case 'education':
+      return <School {...iconProps} />;
+    default:
+      return <HelpCircle {...iconProps} />;
+  }
 };
 
 export default AssetIcon;
