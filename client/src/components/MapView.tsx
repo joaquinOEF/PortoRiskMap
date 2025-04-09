@@ -12,6 +12,7 @@ const MapView: React.FC = () => {
   const { filters, selectedItem } = state;
   const [map, setMap] = useState<L.Map | null>(null);
   const [markersLayer, setMarkersLayer] = useState<L.LayerGroup | null>(null);
+  const [riskZonesLayer, setRiskZonesLayer] = useState<L.GeoJSON | null>(null);
   const [isMapReady, setIsMapReady] = useState(false);
 
   // Initialize map
@@ -278,6 +279,84 @@ const MapView: React.FC = () => {
       });
     }
   }, [map, markersLayer, filters, dispatch]);
+
+  // Load and display GeoJSON landslide risk zones
+  useEffect(() => {
+    if (!map || !isMapReady) return;
+
+    // Create GeoJSON layer
+    fetch('/data/deslizamento_alto.geojson')
+      .then(response => response.json())
+      .then(data => {
+        // Remove existing layer if it exists
+        if (riskZonesLayer) {
+          map.removeLayer(riskZonesLayer);
+        }
+
+        // Create new GeoJSON layer with styling and tooltips
+        const newRiskZonesLayer = L.geoJSON(data, {
+          style: () => ({
+            color: '#E76F51', // High risk - same color as high risk
+            weight: 2,
+            opacity: 0.7,
+            fillColor: '#E76F51',
+            fillOpacity: 0.3,
+            dashArray: '3'
+          }),
+          onEachFeature: (feature, layer) => {
+            if (feature.properties) {
+              // Create tooltip content
+              const tooltipContent = `
+                <div class="marker-tooltip landslide-tooltip">
+                  <strong>${feature.properties.neighbourhood}</strong>
+                  <div class="risk-badge">Risco de Deslizamento: <span class="risk-high">ALTO</span></div>
+                  <div class="text-sm mt-1">${feature.properties.description.substring(0, 120)}...</div>
+                  <div class="tooltip-footer">Clique para mais detalhes</div>
+                </div>
+              `;
+              
+              // Bind tooltip to layer
+              layer.bindTooltip(tooltipContent, {
+                direction: 'top',
+                sticky: true,
+                opacity: 0.9,
+                className: 'risk-zone-tooltip'
+              });
+
+              // Add click handler
+              layer.on('click', () => {
+                // Create popup with more detailed information
+                const popupContent = `
+                  <div class="risk-zone-popup">
+                    <h3 class="font-bold">${feature.properties.neighbourhood}</h3>
+                    <div class="risk-badge my-1">Risco: <span class="risk-high">${feature.properties.risk_level}</span></div>
+                    <p class="description">${feature.properties.description}</p>
+                    <p class="observation mt-2 text-sm">${feature.properties.observation}</p>
+                  </div>
+                `;
+                
+                layer.bindPopup(popupContent, { 
+                  maxWidth: 300,
+                  className: 'risk-zone-popup'
+                }).openPopup();
+              });
+            }
+          }
+        }).addTo(map);
+
+        // Store the layer reference
+        setRiskZonesLayer(newRiskZonesLayer);
+      })
+      .catch(error => {
+        console.error("Error loading GeoJSON data:", error);
+      });
+
+    return () => {
+      if (riskZonesLayer) {
+        map.removeLayer(riskZonesLayer);
+      }
+    };
+  }, [map, isMapReady, riskZonesLayer]);
 
   // Update map view when state changes
   useEffect(() => {
