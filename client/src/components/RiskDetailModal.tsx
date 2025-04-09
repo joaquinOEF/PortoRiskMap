@@ -8,6 +8,8 @@ interface RiskDetailModalProps {
     neighbourhood: string;
     description: string;
     risk_level: string;
+    hazard_type?: string;
+    hazard_en?: string;
     observation?: string;
     vulnerability_score?: string;
     risk_score?: string;
@@ -52,6 +54,13 @@ const RiskDetailModal: React.FC<RiskDetailModalProps> = ({ isOpen, onClose, data
                 <p className="text-sm text-gray-500">Risk Level</p>
                 <p className="font-semibold text-red-600">{data.risk_level}</p>
               </div>
+              
+              {data.hazard_en && (
+                <div>
+                  <p className="text-sm text-gray-500">Hazard Type</p>
+                  <p className="font-semibold">{data.hazard_en}</p>
+                </div>
+              )}
               
               {data.vulnerability_score && (
                 <div>

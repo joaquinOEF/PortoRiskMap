@@ -54,12 +54,12 @@ const NeighborhoodsTab: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [neighborhoods, setNeighborhoods] = useState<LandslideRiskArea[]>([]);
   
-  // Fetch the landslide risk data from the GeoJSON file
+  // Fetch all hazards risk data from the GeoJSON file
   useEffect(() => {
     const fetchNeighborhoods = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/data/deslizamento_alto.geojson');
+        const response = await fetch('/data/detailed_all_hazards_all.geojson');
         const data = await response.json();
         
         if (data && data.features) {
@@ -212,7 +212,7 @@ const NeighborhoodsTab: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                <div className="mt-2 grid grid-cols-3 gap-2 text-sm">
                   <div>
                     <span className="text-xs text-neutral-700">Risk Level:</span>
                     <div className="flex items-center">
@@ -231,6 +231,15 @@ const NeighborhoodsTab: React.FC = () => {
                     <div className="flex items-center">
                       <span className="capitalize">
                         {neighborhood.properties.vulnerability_score}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <span className="text-xs text-neutral-700">Hazard Type:</span>
+                    <div className="flex items-center">
+                      <span className="capitalize">
+                        {neighborhood.properties.hazard_en}
                       </span>
                     </div>
                   </div>

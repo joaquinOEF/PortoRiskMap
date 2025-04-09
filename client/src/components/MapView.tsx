@@ -284,18 +284,27 @@ const MapView: React.FC = () => {
           }
         }).addTo(riskZonesGroup);
 
-        // Finally load the interactive deslizamento_alto data as the top layer
-        const detailedResponse = await fetch('/data/deslizamento_alto.geojson');
+        // Finally load the interactive detailed all hazards data as the top layer
+        const detailedResponse = await fetch('/data/detailed_all_hazards_all.geojson');
         const detailedData = await detailedResponse.json();
         L.geoJSON(detailedData, {
           style: (feature) => {
-            // Use deep purple for "Muito alto" risk and red for "Alto" risk
+            // Use different colors based on risk level and hazard type
             const isMuitoAlto = feature?.properties?.risk_score?.includes('Muito alto');
+            
+            // Default colors for landslide (deslizamento)
+            let color = isMuitoAlto ? '#7E22CE' : '#DC2626'; // Deep purple for "Muito alto", bright red for "Alto"
+            
+            // Different colors for different hazard types while maintaining risk level visibility
+            if (feature?.properties?.hazard === 'Enxurrada' || feature?.properties?.hazard_en === 'Flash Flood') {
+              color = isMuitoAlto ? '#3730A3' : '#1E40AF'; // Deep blue variants for flooding
+            }
+            
             return {
-              color: isMuitoAlto ? '#7E22CE' : '#DC2626', // Deep purple for "Muito alto", bright red for "Alto"
+              color: color,
               weight: 2,
               opacity: 0.9,
-              fillColor: isMuitoAlto ? '#7E22CE' : '#DC2626',
+              fillColor: color,
               fillOpacity: 0.4,
               dashArray: '2'
             };
@@ -307,12 +316,17 @@ const MapView: React.FC = () => {
                 feature.properties.risk_score?.includes('Muito alto') ? 'risk-very-high' : 
                 feature.properties.risk_score?.includes('Alto') ? 'risk-high' : 
                 feature.properties.risk_score?.includes('Médio') ? 'risk-medium' : 'risk-low';
+              
+              // Get the hazard type label
+              const hazardType = feature.properties.hazard_en === "Landslide" ? "Deslizamento" : 
+                                feature.properties.hazard_en === "Flash Flood" ? "Enxurrada" : 
+                                feature.properties.hazard;
 
               // Create a simpler tooltip content for hover
               const tooltipContent = `
                 <div class="marker-tooltip landslide-tooltip">
                   <strong>${feature.properties.neighbourhood}</strong>
-                  <div class="risk-badge">Risco de Deslizamento: <span class="${riskClass}">${feature.properties.risk_score || 'ALTO'}</span></div>
+                  <div class="risk-badge">Risco de ${hazardType}: <span class="${riskClass}">${feature.properties.risk_score || 'ALTO'}</span></div>
                   <div class="tooltip-footer">Clique para ver mais detalhes</div>
                 </div>
               `;
@@ -332,6 +346,8 @@ const MapView: React.FC = () => {
                   neighbourhood: feature.properties.neighbourhood,
                   description: feature.properties.description,
                   risk_level: feature.properties.risk_score || 'Alto',
+                  hazard_type: feature.properties.hazard,
+                  hazard_en: feature.properties.hazard_en,
                   observation: feature.properties.observation,
                   vulnerability_score: feature.properties.vulnerability_score,
                   risk_score: feature.properties.risk_score,
