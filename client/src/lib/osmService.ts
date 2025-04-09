@@ -29,11 +29,15 @@ function isPointInPolygon(point: LatLng, polygon: number[][][]): boolean {
 function isPointInRing(point: LatLng, ring: number[][]): boolean {
   let inside = false;
   for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-    const xi = ring[i][0], yi = ring[i][1];
-    const xj = ring[j][0], yj = ring[j][1];
+    // GeoJSON coordinates are [longitude, latitude]
+    const xi = ring[i][0], yi = ring[i][1];  // longitude, latitude
+    const xj = ring[j][0], yj = ring[j][1];  // longitude, latitude
     
-    const intersect = ((yi > point.lng) !== (yj > point.lng)) &&
-      (point.lat < (xj - xi) * (point.lng - yi) / (yj - yi) + xi);
+    // For point-in-polygon testing, we need to swap the order
+    // since LatLng has {lat, lng} format
+    const intersect = ((yi > point.lat) !== (yj > point.lat)) && 
+      (point.lng < (xj - xi) * (point.lat - yi) / (yj - yi) + xi);
+    
     if (intersect) inside = !inside;
   }
   return inside;
@@ -46,10 +50,14 @@ function determineRiskLevel(
   mediumRiskZones: any[], 
   lowRiskZones: any[]
 ): RiskLevel {
-  // Check high risk zones first
+  // Check high risk zones first (including detailed deslizamento_alto zones)
   for (const zone of highRiskZones) {
-    if (zone.geometry.type === 'MultiPolygon') {
-      if (isPointInPolygon(location, zone.geometry.coordinates)) {
+    if (zone.geometry.type === 'MultiPolygon' || zone.geometry.type === 'Polygon') {
+      const coordinates = zone.geometry.type === 'Polygon' 
+        ? [zone.geometry.coordinates] 
+        : zone.geometry.coordinates;
+        
+      if (isPointInPolygon(location, coordinates)) {
         return 'high';
       }
     }
@@ -57,23 +65,20 @@ function determineRiskLevel(
   
   // Check medium risk zones next
   for (const zone of mediumRiskZones) {
-    if (zone.geometry.type === 'MultiPolygon') {
-      if (isPointInPolygon(location, zone.geometry.coordinates)) {
+    if (zone.geometry.type === 'MultiPolygon' || zone.geometry.type === 'Polygon') {
+      const coordinates = zone.geometry.type === 'Polygon' 
+        ? [zone.geometry.coordinates] 
+        : zone.geometry.coordinates;
+        
+      if (isPointInPolygon(location, coordinates)) {
         return 'medium';
       }
     }
   }
   
-  // Check low risk zones last
-  for (const zone of lowRiskZones) {
-    if (zone.geometry.type === 'MultiPolygon') {
-      if (isPointInPolygon(location, zone.geometry.coordinates)) {
-        return 'low';
-      }
-    }
-  }
+  // We're skipping low risk checks as requested - assets not in high or medium zones won't be shown
   
-  // If not in any zone, return low risk
+  // If not in high or medium zone, return low risk (these won't be displayed)
   return 'low';
 }
 
@@ -222,7 +227,7 @@ export async function fetchCriticalAssets(): Promise<Asset[]> {
     const osmData = osmResponse.elements as OsmElement[];
     
     // Process the OSM data into Asset format
-    const assets: Asset[] = osmData.map((element: OsmElement, index: number) => {
+    const assetsRaw: (Asset | null)[] = osmData.map((element: OsmElement, index: number) => {
       // Extract coordinates (handling both node and way/relation with center)
       let lat, lng;
       
@@ -254,6 +259,9 @@ export async function fetchCriticalAssets(): Promise<Asset[]> {
       // This can be updated if flood risk data becomes available
       const floodRisk: RiskLevel = 'low';
       
+      // Skip assets that aren't in high or medium risk zones
+      if (landslideRisk === 'low') return null;
+      
       return {
         id: index + 1, // Assign unique IDs
         name,
@@ -262,7 +270,19 @@ export async function fetchCriticalAssets(): Promise<Asset[]> {
         landslideRisk,
         location
       };
-    }).filter(Boolean) as Asset[]; // Filter out any null results
+    });
+    
+    // Filter out nulls and sort by risk level
+    const filteredAssets: Asset[] = assetsRaw.filter(Boolean) as Asset[];
+    
+    // Sort assets by risk level (high to medium)
+    filteredAssets.sort((a, b) => {
+      if (a.landslideRisk === 'high' && b.landslideRisk !== 'high') return -1;
+      if (a.landslideRisk !== 'high' && b.landslideRisk === 'high') return 1;
+      return 0;
+    });
+    
+    const assets = filteredAssets;
     
     return assets;
   } catch (error) {
