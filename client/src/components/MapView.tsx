@@ -87,7 +87,7 @@ const MapView: React.FC = () => {
       
       // Filter assets based on their risk levels and current filter settings
       const filteredAssets = assets.filter(asset => {
-        // Check risk level filters
+        // Filter by risk level 
         const riskLevelPasses = 
           (asset.floodRisk === 'high' || asset.landslideRisk === 'high') && filters.showHigh ||
           (asset.floodRisk === 'medium' || asset.landslideRisk === 'medium') && filters.showMedium ||
@@ -95,13 +95,16 @@ const MapView: React.FC = () => {
         
         // Check hazard type filters
         const floodVisible = filters.showFloodRisk && 
-          (asset.floodRisk === 'high' || asset.floodRisk === 'medium' || asset.floodRisk === 'low');
+          (asset.floodRisk === 'high' || asset.floodRisk === 'medium');
           
         const landslideVisible = filters.showLandslideRisk && 
-          (asset.landslideRisk === 'high' || asset.landslideRisk === 'medium' || asset.landslideRisk === 'low');
-          
-        // Asset passes if it meets risk level criteria AND at least one hazard type filter
-        return riskLevelPasses && (floodVisible || landslideVisible);
+          (asset.landslideRisk === 'high' || asset.landslideRisk === 'medium');
+        
+        // Asset passes if it meets risk level criteria AND at least one of the selected hazard type filters
+        const hazardPasses = (filters.showFloodRisk && floodVisible) || 
+                             (filters.showLandslideRisk && landslideVisible);
+                             
+        return riskLevelPasses && hazardPasses;
       });
       
       // Add filtered assets to the map
