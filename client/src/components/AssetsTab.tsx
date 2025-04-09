@@ -20,6 +20,26 @@ const AssetsTab: React.FC = () => {
       (a.landslideRisk === 'low' && filters.showLow);
       
     return floodVisible || landslideVisible;
+  })
+  // Sort by risk level (high to low)
+  .sort((a, b) => {
+    // Risk level priority: high (3) > medium (2) > low (1)
+    const riskLevelValue = (risk: 'high' | 'medium' | 'low') => {
+      if (risk === 'high') return 3;
+      if (risk === 'medium') return 2;
+      return 1;
+    };
+    
+    // First sort by flood risk
+    const aFloodValue = riskLevelValue(a.floodRisk);
+    const bFloodValue = riskLevelValue(b.floodRisk);
+    
+    if (aFloodValue !== bFloodValue) {
+      return bFloodValue - aFloodValue; // Descending order
+    }
+    
+    // If flood risks are equal, sort by landslide risk
+    return riskLevelValue(b.landslideRisk) - riskLevelValue(a.landslideRisk);
   });
   
   const handleAssetClick = (id: number) => {

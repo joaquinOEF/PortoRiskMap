@@ -12,30 +12,105 @@ const MapView: React.FC = () => {
   const { filters, selectedItem } = state;
   const [map, setMap] = useState<L.Map | null>(null);
   const [markersLayer, setMarkersLayer] = useState<L.LayerGroup | null>(null);
+  const [isMapReady, setIsMapReady] = useState(false);
 
   // Initialize map
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const mapInstance = L.map('map', {
-        center: [state.mapView.center.lat, state.mapView.center.lng],
-        zoom: state.mapView.zoom,
-        zoomControl: false
-      });
+    if (typeof window === 'undefined') return;
+    
+    // Create map instance
+    const mapInstance = L.map('map', {
+      center: [state.mapView.center.lat, state.mapView.center.lng],
+      zoom: state.mapView.zoom,
+      zoomControl: false
+    });
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(mapInstance);
+    // Satellite map tiles
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    }).addTo(mapInstance);
 
-      const newMarkersLayer = L.layerGroup().addTo(mapInstance);
-      
-      setMap(mapInstance);
-      setMarkersLayer(newMarkersLayer);
+    // Add semi-transparent overlay for streets
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      opacity: 0.3
+    }).addTo(mapInstance);
 
-      return () => {
-        mapInstance.remove();
-      };
-    }
+    // Create new markers layer
+    const newMarkersLayer = L.layerGroup().addTo(mapInstance);
+    
+    // Set state
+    setMap(mapInstance);
+    setMarkersLayer(newMarkersLayer);
+    
+    // Wait for map to be ready
+    mapInstance.whenReady(() => {
+      setIsMapReady(true);
+    });
+
+    return () => {
+      mapInstance.remove();
+    };
   }, []);
+
+  // Add grid overlay when map is ready
+  useEffect(() => {
+    if (!map || !isMapReady) return;
+    
+    // Create grid overlay for risk visualization
+    const gridLayer = L.layerGroup().addTo(map);
+    
+    // Center area around Porto Alegre
+    const centerLat = -30.0346;
+    const centerLng = -51.2177;
+    
+    // Create a grid of cells
+    const cellSize = 0.01; // roughly 1km
+    const gridWidth = 25;
+    const gridHeight = 25;
+    
+    for (let i = 0; i < gridWidth; i++) {
+      for (let j = 0; j < gridHeight; j++) {
+        const cellLat = centerLat - (gridHeight/2 * cellSize) + (j * cellSize);
+        const cellLng = centerLng - (gridWidth/2 * cellSize) + (i * cellSize);
+        
+        // Generate a risk value for each cell (mock data)
+        // This creates a pattern with higher risk closer to the river
+        const distanceFromCenter = Math.sqrt(
+          Math.pow(cellLat - centerLat, 2) + 
+          Math.pow(cellLng - centerLng, 2)
+        );
+        
+        // Generate pattern of risk (mock data)
+        const isRiverArea = (i > 10 && i < 15) || (j > 10 && j < 15); // "river" area
+        const floodRiskFactor = isRiverArea ? 0.9 : Math.max(0, 1 - distanceFromCenter * 10);
+        
+        // Create risk overlay color
+        const getOverlayColor = (risk: number) => {
+          if (risk > 0.7) return 'rgba(231, 111, 81, 0.5)'; // high - red
+          if (risk > 0.4) return 'rgba(244, 162, 97, 0.3)'; // medium - orange
+          return 'rgba(42, 157, 143, 0.2)'; // low - green
+        };
+        
+        // Create rectangle for the cell
+        const rectBounds = [
+          [cellLat, cellLng],
+          [cellLat + cellSize, cellLng + cellSize]
+        ];
+        
+        L.rectangle(rectBounds as L.LatLngBoundsExpression, {
+          color: 'transparent',
+          fillColor: getOverlayColor(floodRiskFactor),
+          fillOpacity: 0.6,
+          weight: 0
+        }).addTo(gridLayer);
+      }
+    }
+    
+    return () => {
+      map.removeLayer(gridLayer);
+    };
+  }, [map, isMapReady]);
 
   // Update markers when filters change
   useEffect(() => {

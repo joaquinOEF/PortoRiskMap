@@ -28,14 +28,19 @@ const HistoryTab: React.FC = () => {
     }
   };
   
+  // Sort historical events by date (most recent first)
+  const sortedEvents = [...historicalEvents].sort((a, b) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
+  
   return (
     <div className="p-4">
       <div className="flex justify-between mb-4">
         <h3 className="font-semibold">Past Hazard Events</h3>
-        <span className="text-sm text-neutral-700">{historicalEvents.length} events</span>
+        <span className="text-sm text-neutral-700">{sortedEvents.length} events</span>
       </div>
       
-      {historicalEvents.map(event => (
+      {sortedEvents.map(event => (
         <div 
           key={event.id}
           className="bg-white rounded shadow-sm p-3 mb-3 hover:shadow-md transition duration-200 cursor-pointer"
