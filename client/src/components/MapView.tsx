@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { neighborhoods, assets, historicalEvents, getRiskColor } from '@/lib/mockData';
+import { neighborhoods, assets, historicalEvents, getRiskColor, getAssetIconSVG } from '@/lib/mockData';
 import { useAppContext } from '@/contexts/AppContext';
 import MapControls from './MapControls';
 import MapLegend from './MapLegend';
@@ -168,13 +168,28 @@ const MapView: React.FC = () => {
         })
         .forEach(a => {
           const color = getRiskColor(a.floodRisk);
+          
+          // Get the appropriate SVG paths for the asset type
+          const svgPaths = getAssetIconSVG(a.type);
+          
+          // Create the custom HTML for the icon
+          const html = `
+            <div style="background-color: white; border-radius: 50%; padding: 3px; border: 2px solid ${color}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                ${svgPaths}
+              </svg>
+            </div>
+          `;
+          
+          // Create the icon
           const icon = L.divIcon({
-            className: 'custom-div-icon',
-            html: `<div style="background-color:${color}; width:14px; height:14px; transform:rotate(45deg); border:2px solid white;"></div>`,
-            iconSize: [14, 14],
-            iconAnchor: [7, 7]
+            className: 'custom-asset-marker',
+            html: html,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14]
           });
           
+          // Create marker
           const marker = L.marker([a.location.lat, a.location.lng], { icon }).addTo(markersLayer!);
           
           marker.on('click', () => {

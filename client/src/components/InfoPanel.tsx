@@ -1,8 +1,9 @@
 import React from 'react';
 import { useAppContext } from '@/contexts/AppContext';
-import { neighborhoods, assets, historicalEvents } from '@/lib/mockData';
+import { neighborhoods, assets, historicalEvents, getRiskColor } from '@/lib/mockData';
 import RiskIndicator from './RiskIndicator';
-import { X } from 'lucide-react';
+import AssetIcon from './AssetIcon';
+import { X, Users } from 'lucide-react';
 
 const InfoPanel: React.FC = () => {
   const { state, dispatch } = useAppContext();
@@ -34,8 +35,12 @@ const InfoPanel: React.FC = () => {
           </button>
         </div>
         <div className="mt-2 text-sm">
-          <div className="mb-1">
-            <span className="font-medium">Population at risk:</span> {neighborhood.populationAtRisk.toLocaleString()}
+          <div className="mb-1 flex items-center">
+            <span className="font-medium mr-1">Population at risk:</span> 
+            <div className="flex items-center">
+              <Users className="h-3 w-3 mr-1 text-primary" />
+              {neighborhood.populationAtRisk.toLocaleString()}
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
@@ -75,8 +80,15 @@ const InfoPanel: React.FC = () => {
           </button>
         </div>
         <div className="mt-2 text-sm">
-          <div className="mb-1">
-            <span className="font-medium">Type:</span> <span className="capitalize">{asset.type}</span>
+          <div className="mb-1 flex items-center">
+            <span className="font-medium mr-1">Type:</span> 
+            <AssetIcon 
+              assetType={asset.type} 
+              color={getRiskColor(asset.floodRisk)} 
+              size={16}
+              className="mr-1"
+            />
+            <span className="capitalize">{asset.type}</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>

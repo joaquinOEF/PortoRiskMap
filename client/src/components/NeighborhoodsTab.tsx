@@ -2,6 +2,7 @@ import React from "react";
 import { useAppContext } from "@/contexts/AppContext";
 import { neighborhoods } from "@/lib/mockData";
 import RiskIndicator from "./RiskIndicator";
+import { Users } from "lucide-react";
 
 const NeighborhoodsTab: React.FC = () => {
   const { state, dispatch } = useAppContext();
@@ -82,7 +83,8 @@ const NeighborhoodsTab: React.FC = () => {
         >
           <div className="flex justify-between">
             <h4 className="font-medium">{neighborhood.name}</h4>
-            <span className="text-sm bg-gray-100 px-2 py-0.5 rounded-full">
+            <span className="text-sm bg-gray-100 px-2 py-0.5 rounded-full flex items-center">
+              <Users className="h-3 w-3 mr-1 text-primary" />
               {neighborhood.populationAtRisk.toLocaleString()} at risk
             </span>
           </div>

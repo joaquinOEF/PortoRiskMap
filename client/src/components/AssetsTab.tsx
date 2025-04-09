@@ -1,7 +1,8 @@
 import React from "react";
 import { useAppContext } from "@/contexts/AppContext";
-import { assets, getAssetTypeLabel } from "@/lib/mockData";
+import { assets, getAssetTypeLabel, getRiskColor } from "@/lib/mockData";
 import RiskIndicator from "./RiskIndicator";
+import AssetIcon from "./AssetIcon";
 
 const AssetsTab: React.FC = () => {
   const { state, dispatch } = useAppContext();
@@ -79,9 +80,15 @@ const AssetsTab: React.FC = () => {
         >
           <div className="flex justify-between">
             <h4 className="font-medium">{asset.name}</h4>
-            <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full">
+            <div className="flex items-center text-xs bg-primary text-white px-2 py-0.5 rounded-full">
+              <AssetIcon 
+                assetType={asset.type} 
+                color="white" 
+                size={12}
+                className="mr-1"
+              />
               {getAssetTypeLabel(asset.type)}
-            </span>
+            </div>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
             <div>
