@@ -1,0 +1,60 @@
+Develop a web application titled "Porto Alegre Risk Visualizer" designed to showcase climate risk insights specifically focused on flood and landslide hazards within Porto Alegre. Use mock data following these clear guidelines for realism:
+
+Mock Data Generation Guidelines:
+
+Neighborhoods at Risk:
+
+Select 5–7 actual neighborhoods from Porto Alegre.
+
+Assign each neighborhood realistic risk levels for Flood Risk (High, Medium, Low) and Landslide Risk (High, Medium, Low), based on plausible assumptions (e.g., low-lying neighborhoods have higher flood risk, sloped areas have higher landslide risk).
+
+Assign a total "population at risk" per neighborhood (realistic numbers in hundreds or thousands).
+
+Assets at Risk:
+
+Include around 7–10 key infrastructure assets (e.g., Hospital de Clínicas, Banrisul Bank, Trensurb Station).
+
+Assign each asset a realistic risk rating (High, Medium, Low) for flood and landslide.
+
+Ensure asset locations make sense geographically (e.g., assets near water bodies might have higher flood risk).
+
+Past Occurrences:
+
+Include 5–8 realistic historical events with brief descriptions (e.g., "January 2020 flooding in Centro Histórico," or "March 2019 landslide near Morro Santana").
+
+For each event, clearly indicate the affected area.
+
+Application Layout Guidelines:
+
+Top Navigation Bar:
+
+A clean, simple navbar featuring the app title: "Porto Alegre Risk Visualizer."
+
+Main Map Area:
+
+Central map placeholder representing Porto Alegre.
+
+Clearly mark neighborhoods/assets with points or simple polygons in line with the mock data generated above.
+
+Side Panel (Sidesheet):
+
+Positioned neatly alongside the map with three distinct tabs:
+
+1. Neighborhoods at Risk
+
+List of cards: Each card shows neighborhood name, flood risk level, landslide risk level, and total population at risk.
+2. Assets at Risk
+
+List of cards: Each card displays asset name (e.g., Hospital, Bank, Station), and risk levels (High, Medium, Low).
+3. Past Occurrences
+
+List of cards: Each card provides brief details of the past hazard event (date, hazard type, affected area).
+
+Interaction & Usability:
+
+Ensure smooth, intuitive tab-switching in the sidesheet.
+
+Clearly differentiate risk levels visually (e.g., color coding: red-high, yellow-medium, green-low).
+
+Keep the interface clean, simple, and professional.
+
