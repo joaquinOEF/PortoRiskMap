@@ -34,15 +34,15 @@ const MapLegend: React.FC = () => {
             <span>Past Event</span>
           </div>
           <div className="flex items-center">
-            <span className="w-5 h-3 border border-[#E76F51] bg-[#E76F51] opacity-70 mr-2" style={{ borderStyle: 'dashed' }}></span>
+            <span className="w-5 h-3 bg-[#FFA500] opacity-60 mr-2"></span>
             <span>High Landslide Risk</span>
           </div>
           <div className="flex items-center">
-            <span className="w-5 h-3 border border-[#F4A261] bg-[#F4A261] opacity-60 mr-2" style={{ borderStyle: 'dashed' }}></span>
+            <span className="w-5 h-3 bg-[#FFFF00] opacity-60 mr-2"></span>
             <span>Medium Landslide Risk</span>
           </div>
           <div className="flex items-center">
-            <span className="w-5 h-3 border border-[#2A9D8F] bg-[#2A9D8F] opacity-50 mr-2" style={{ borderStyle: 'dashed' }}></span>
+            <span className="w-5 h-3 bg-[#FFFFCC] opacity-60 mr-2"></span>
             <span>Low Landslide Risk</span>
           </div>
           <div className="flex items-center">
