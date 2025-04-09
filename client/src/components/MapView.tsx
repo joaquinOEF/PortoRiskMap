@@ -54,62 +54,15 @@ const MapView: React.FC = () => {
     };
   }, []);
 
-  // Add grid overlay when map is ready
+  // We've removed the grid overlay in favor of real GeoJSON data
+  // This effect used to add the grid overlay, but now it's empty
   useEffect(() => {
     if (!map || !isMapReady) return;
     
-    // Create grid overlay for risk visualization
-    const gridLayer = L.layerGroup().addTo(map);
-    
-    // Center area around Porto Alegre
-    const centerLat = -30.0346;
-    const centerLng = -51.2177;
-    
-    // Create a grid of cells
-    const cellSize = 0.01; // roughly 1km
-    const gridWidth = 25;
-    const gridHeight = 25;
-    
-    for (let i = 0; i < gridWidth; i++) {
-      for (let j = 0; j < gridHeight; j++) {
-        const cellLat = centerLat - (gridHeight/2 * cellSize) + (j * cellSize);
-        const cellLng = centerLng - (gridWidth/2 * cellSize) + (i * cellSize);
-        
-        // Generate a risk value for each cell (mock data)
-        // This creates a pattern with higher risk closer to the river
-        const distanceFromCenter = Math.sqrt(
-          Math.pow(cellLat - centerLat, 2) + 
-          Math.pow(cellLng - centerLng, 2)
-        );
-        
-        // Generate pattern of risk (mock data)
-        const isRiverArea = (i > 10 && i < 15) || (j > 10 && j < 15); // "river" area
-        const floodRiskFactor = isRiverArea ? 0.9 : Math.max(0, 1 - distanceFromCenter * 10);
-        
-        // Create risk overlay color
-        const getOverlayColor = (risk: number) => {
-          if (risk > 0.7) return 'rgba(231, 111, 81, 0.5)'; // high - red
-          if (risk > 0.4) return 'rgba(244, 162, 97, 0.3)'; // medium - orange
-          return 'rgba(42, 157, 143, 0.2)'; // low - green
-        };
-        
-        // Create rectangle for the cell
-        const rectBounds = [
-          [cellLat, cellLng],
-          [cellLat + cellSize, cellLng + cellSize]
-        ];
-        
-        L.rectangle(rectBounds as L.LatLngBoundsExpression, {
-          color: 'transparent',
-          fillColor: getOverlayColor(floodRiskFactor),
-          fillOpacity: 0.6,
-          weight: 0
-        }).addTo(gridLayer);
-      }
-    }
+    // No grid overlay is added anymore
     
     return () => {
-      map.removeLayer(gridLayer);
+      // Cleanup function is empty since we don't add any layer
     };
   }, [map, isMapReady]);
 
