@@ -451,9 +451,10 @@ const MapView: React.FC = () => {
       <div className="md:w-2/3 lg:w-3/4 relative order-1 md:order-2 h-[60vh] md:h-auto">
         <div id="map" className="w-full h-full bg-gray-200 relative">
           <MapControls map={map} />
-          <MapLegend />
           {selectedItem.id !== null && <InfoPanel />}
         </div>
+        {/* Position MapLegend as a direct child of the container div for better positioning */}
+        <MapLegend />
       </div>
       
       {/* Risk Detail Modal - rendered at the root level for proper z-index stacking */}

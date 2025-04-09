@@ -5,7 +5,7 @@ const MapLegend: React.FC = () => {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="absolute bottom-0 right-0 z-10 m-4 bg-white shadow-lg rounded p-3 text-xs max-h-[80vh] overflow-y-auto max-w-[200px]">
+    <div className="absolute bottom-4 right-4 z-20 bg-white shadow-lg rounded p-3 text-xs max-h-[80vh] overflow-y-auto max-w-[200px]">
       <div className="flex justify-between items-center mb-2">
         <h4 className="font-medium">Risk Legend</h4>
         <button 
