@@ -11,7 +11,7 @@ export type RiskLevel = "high" | "medium" | "low";
 export type AssetType = "healthcare" | "financial" | "transportation" | "cultural" | "utility" | "education" | "other";
 
 // Tab types
-export type TabType = "neighborhoods" | "assets" | "history";
+export type TabType = "neighborhoods" | "assets" | "history" | "actions";
 
 // Neighborhood data type
 export interface Neighborhood {
@@ -61,6 +61,28 @@ export interface SelectedItem {
 export interface MapViewState {
   center: LatLng;
   zoom: number;
+}
+
+// Recommendation categories
+export type RecommendationCategory = 
+  | "Emergency Preparedness" 
+  | "Infrastructure" 
+  | "Policy" 
+  | "Community Engagement" 
+  | "Environmental";
+
+// Recommendation priority (1-5)
+export type PriorityLevel = 1 | 2 | 3 | 4 | 5;
+
+// Recommendation data type
+export interface Recommendation {
+  id: number;
+  title: string;
+  category: RecommendationCategory;
+  impactLevel: "High" | "Medium" | "Low";
+  priority: PriorityLevel;
+  neighborhoods: string[];
+  description: string;
 }
 
 // App context state

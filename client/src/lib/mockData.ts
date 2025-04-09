@@ -1,4 +1,4 @@
-import { Neighborhood, Asset, HistoricalEvent, RiskLevel, AssetType } from "@/types";
+import { Neighborhood, Asset, HistoricalEvent, RiskLevel, AssetType, Recommendation } from "@/types";
 
 // Mock data for neighborhoods
 export const neighborhoods: Neighborhood[] = [
@@ -237,3 +237,86 @@ export const getAssetIconSVG = (type: AssetType): string => {
       return '<path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1v1H9z"/><path d="M14 9h1v1h-1z"/><path d="M9 14h1v1H9z"/><path d="M14 14h1v1h-1z"/>';
   }
 };
+
+// Mock data for recommendations
+// Helper function to generate priority stars
+export const getPriorityStars = (priority: number): string => {
+  const filled = '★'.repeat(priority);
+  const empty = '☆'.repeat(5 - priority);
+  return filled + empty;
+};
+
+export const recommendations: Recommendation[] = [
+  {
+    id: 1,
+    title: "Install Early Warning Flood Sensors",
+    category: "Emergency Preparedness",
+    impactLevel: "High",
+    priority: 5,
+    neighborhoods: ["Cidade Baixa", "Menino Deus", "Centro Histórico"],
+    description: "Deploy automated flood sensors along key flood-prone waterways. Integrate sensors with emergency alert systems to provide real-time flood warnings, improving response times and resident safety."
+  },
+  {
+    id: 2,
+    title: "Upgrade Drainage Infrastructure",
+    category: "Infrastructure",
+    impactLevel: "High",
+    priority: 4,
+    neighborhoods: ["Centro Histórico", "Cidade Baixa"],
+    description: "Modernize and expand the current drainage system with larger capacity culverts and stormwater detention areas. Implement regular maintenance protocols to prevent blockages during heavy rainfall events."
+  },
+  {
+    id: 3,
+    title: "Develop Community Emergency Response Teams",
+    category: "Community Engagement",
+    impactLevel: "Medium",
+    priority: 3,
+    neighborhoods: ["Sarandi", "Cidade Baixa", "Bom Fim"],
+    description: "Train neighborhood volunteers in emergency response procedures specific to flood and landslide events. Equip teams with necessary tools and establish clear communication channels with city emergency services."
+  },
+  {
+    id: 4,
+    title: "Landslide Risk Mapping and Monitoring",
+    category: "Policy",
+    impactLevel: "High",
+    priority: 4,
+    neighborhoods: ["Sarandi", "Morro Santana"],
+    description: "Conduct detailed geological surveys of hillside areas to identify potential landslide zones. Implement continuous monitoring systems using ground sensors and satellite imagery to detect early warning signs."
+  },
+  {
+    id: 5,
+    title: "Reforestation of Critical Hillsides",
+    category: "Environmental",
+    impactLevel: "Medium",
+    priority: 3,
+    neighborhoods: ["Sarandi", "Morro Santana"],
+    description: "Restore native vegetation on slopes with high erosion rates to prevent soil destabilization. Focus on deep-rooted species that can help bind soil and improve water retention capacity of hillsides."
+  },
+  {
+    id: 6,
+    title: "Healthcare Facility Flood Protection",
+    category: "Infrastructure",
+    impactLevel: "High",
+    priority: 5,
+    neighborhoods: ["Centro Histórico", "Menino Deus"],
+    description: "Install flood barriers, elevated equipment platforms, and backup power systems at critical healthcare facilities. Develop comprehensive evacuation plans for patients in case of extreme flood events."
+  },
+  {
+    id: 7,
+    title: "Revise Building Codes for Flood Zones",
+    category: "Policy",
+    impactLevel: "Medium",
+    priority: 3,
+    neighborhoods: ["Centro Histórico", "Cidade Baixa", "Menino Deus", "Ipanema"],
+    description: "Update municipal building regulations to require elevated first floors, flood-resistant materials, and improved stormwater management for all new construction in flood-prone areas."
+  },
+  {
+    id: 8,
+    title: "Establish Flood Emergency Evacuation Routes",
+    category: "Emergency Preparedness",
+    impactLevel: "High",
+    priority: 4,
+    neighborhoods: ["Cidade Baixa", "Centro Histórico", "Menino Deus", "Sarandi"],
+    description: "Designate and clearly mark evacuation routes in high-risk neighborhoods. Install informational signage and conduct regular community drills to ensure residents are familiar with safe evacuation procedures."
+  }
+];
