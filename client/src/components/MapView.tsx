@@ -305,11 +305,17 @@ const MapView: React.FC = () => {
           }),
           onEachFeature: (feature, layer) => {
             if (feature.properties) {
+              // Get the risk class for styling
+              const riskClass = 
+                feature.properties.risk_score?.includes('Muito alto') ? 'risk-high' : 
+                feature.properties.risk_score?.includes('Alto') ? 'risk-high' : 
+                feature.properties.risk_score?.includes('Médio') ? 'risk-medium' : 'risk-low';
+                
               // Create a simpler tooltip content for hover
               const tooltipContent = `
                 <div class="marker-tooltip landslide-tooltip">
                   <strong>${feature.properties.neighbourhood}</strong>
-                  <div class="risk-badge">Risco de Deslizamento: <span class="risk-high">ALTO</span></div>
+                  <div class="risk-badge">Risco de Deslizamento: <span class="${riskClass}">${feature.properties.risk_score || 'ALTO'}</span></div>
                   <div class="tooltip-footer">Clique para ver mais detalhes</div>
                 </div>
               `;
@@ -328,7 +334,7 @@ const MapView: React.FC = () => {
                 setSelectedRiskData({
                   neighbourhood: feature.properties.neighbourhood,
                   description: feature.properties.description,
-                  risk_level: feature.properties.risk_level || 'Alto',
+                  risk_level: feature.properties.risk_score || 'Alto',
                   observation: feature.properties.observation,
                   vulnerability_score: feature.properties.vulnerability_score,
                   risk_score: feature.properties.risk_score,
